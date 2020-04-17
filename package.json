@@ -1,0 +1,40 @@
+{
+  "name": "nature",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run graphql",
+    "graphql": "nodemon --exec babel-node -- ./graphql/index.js",
+    "dataScraping": "babel-node -- ./dataScraping/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-server": "^2.12.0",
+    "cheerio": "^1.0.0-rc.3",
+    "cheerio-tableparser": "^1.0.1",
+    "graphql-import": "^1.0.2",
+    "html2json": "^1.0.2",
+    "neo4j-driver": "^4.0.2",
+    "neo4j-graphql-js": "^2.13.0",
+    "node-fetch": "^2.6.0",
+    "tabletojson": "^2.0.4"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.0",
+    "@babel/node": "^7.8.7",
+    "@babel/preset-env": "^7.9.5",
+    "nodemon": "^2.0.3"
+  },
+  "nodemonConfig": {
+    "watch": [
+      "graphql/*"
+    ],
+    "ext": "js, graphql",
+    "delay": 1000
+  }
+}

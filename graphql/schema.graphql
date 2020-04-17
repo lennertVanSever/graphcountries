@@ -1,0 +1,126 @@
+enum AreaUnit {
+  SQUARE_KILOMETERS
+  SQUARE_METERS
+  SQUARE_MILES
+}
+
+
+type TopLevelDomain {
+  _id: String!
+  name: String!
+  countries: [Country] @relation(name: "hasTopLevelDomain", direction: "IN")
+}
+
+type CallingCode {
+  _id: String!
+  name: String!
+  countries: [Country] @relation(name: "hasCallingCode", direction: "IN")
+}
+
+type AlternativeSpelling {
+  _id: String!
+  name: String!
+  countries: [Country] @relation(name: "hasAlternativeSpelling", direction: "IN")
+}
+
+type Timezone {
+  _id: String!
+  name: String!
+  countries: [Country] @relation(name: "hasTimezone", direction: "IN")
+}
+
+type Subregion {
+  _id: String!
+  name: String!
+  region: Region @relation(name: "hasRegion", direction: "OUT")
+  countries: [Country] @relation(name: "hasSubregion", direction: "IN")
+}
+
+type Region {
+  _id: String!
+  name: String!
+  subregions: [Subregion] @relation(name: "hasRegion", direction: "IN")
+}
+
+type Language {
+  _id: String!
+  iso639_1: String!
+  iso639_2: String!
+  name: String!
+  nativeName: String!
+  countries: [Country] @relation(name: "hasOfficialLanguage", direction: "IN")
+}
+
+type Currency {
+  _id: String!
+  code: String!
+  name: String!
+  symbol: String!
+  countries: [Country] @relation(name: "hasCurrency", direction: "IN")
+}
+
+type RegionalBloc {
+  _id: String!
+  acronym: String!
+  name: String!
+  otherAcronyms: String!
+  otherNames: String!
+  countries: [Country] @relation(name: "hasRegionalBlocs", direction: "IN")
+}
+
+type Area {
+  value: Float
+  unit: String
+  "The population per square <your selected unit>"
+  populationDensity: Float
+}
+
+type Country {
+  _id: String!
+  alpha2Code: String!
+  alpha3Code: String!
+  "The area in square kilometer, you can convert the area unit and population density through the convertedArea property"
+  area: Float
+  "The population per square kilometer"
+  populationDensity: Float
+  @cypher(
+    statement: """
+      return this.population / this.area
+    """
+  )
+
+
+  convertedArea(areaUnit: AreaUnit = SQUARE_MILES): Area @relation(name: "NOTHING", direction: "IN")
+  @cypher(
+    statement: """
+      MATCH (unit:Unit { name: areaUnit })
+      return {
+        value: unit.value * this.area,
+        populationDensity: this.population / (unit.value * this.area),
+        unit: unit.unit
+      }
+    """
+  )
+
+  "identifies residents or natives of a particular place, usually derived from the name of the place or that of an ethnic group. https://en.m.wikipedia.org/wiki/Demonym"
+  demonym: String!
+
+  "In economics, the Gini coefficient, sometimes called the Gini index or Gini ratio, is a measure of statistical dispersion intended to represent the income or wealth distribution of a nation's residents, and is the most commonly used measurement of inequality. https://en.m.wikipedia.org/wiki/Gini_coefficient"
+  gini: Float
+
+  latitude: Float!
+  longitude: Float!
+  name: String!
+  nativeName: String!
+  numericCode: String
+  population: Float!
+  topLevelDomains: [TopLevelDomain] @relation(name: "hasTopLevelDomain", direction: "OUT")
+  callingCodes: [CallingCode] @relation(name: "hasCallingCode", direction: "OUT")
+  alternativeSpellings: [AlternativeSpelling] @relation(name: "hasAlternativeSpelling", direction: "OUT")
+  timezones: [Timezone] @relation(name: "hasTimezone", direction: "OUT")
+  borders: [Country] @relation(name: "borders", direction: "OUT")
+  subregion: Subregion @relation(name: "hasSubregion", direction: "OUT")
+  officialLanguages: [Language] @relation(name: "hasOfficialLanguage", direction: "OUT")
+  currencies: [Currency] @relation(name: "hasCurrency", direction: "OUT")
+  regionalBlocs: [RegionalBloc] @relation(name: "hasRegionalBlocs", direction: "OUT")
+}
