@@ -1,3 +1,4 @@
+require('dotenv').config()
 import { makeAugmentedSchema, inferSchema } from 'neo4j-graphql-js';
 import { ApolloServer } from 'apollo-server';
 import { driver } from '../neo4j/index.js';
@@ -13,7 +14,7 @@ fs.readFile('./graphql/schema.graphql', (error, result) => {
       typeDefs,
       config: {
         query: {
-          exclude: ["AlternativeSpelling", "Area"]
+          exclude: ["AlternativeSpelling", "Area", "OtherAcronym", "OtherName", "Translation"]
         },
         mutation: false
       }
@@ -26,6 +27,9 @@ fs.readFile('./graphql/schema.graphql', (error, result) => {
           driver,
           req
         };
+      },
+      engine: {
+        apiKey: "service:graphql-countries:MHaMUmJGfYSddSP_IU5Iqg",
       }
     });
     const port = process.env.GRAPHQL_LISTEN_PORT || 8080;

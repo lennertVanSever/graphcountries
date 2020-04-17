@@ -1,7 +1,8 @@
 import fetch from 'node-fetch';
 import { driver, session } from '../neo4j/index.js';
 import { asyncForEach } from '../utils/async';
-
+import { inferNeo4jSchema } from '../graphql/getInferedSchema';
+import emojiFlags from './emojiFlags.json';
 
 const resetDatabase = async () => {
   await session.run(`
@@ -12,16 +13,18 @@ const resetDatabase = async () => {
   `)
 }
 
-const getAllApiCountries = async (callback) => {
-  const response = await fetch('https://restcountries.eu/rest/v2/all');
-  const data = await response.json();
-  await asyncForEach(data, async (country) => {
-    await callback(country);
+const getData = async (callback) => {
+
+  const responseCountries = await fetch('https://restcountries.eu/rest/v2/all');
+  const countries = await responseCountries.json();
+  
+  await asyncForEach(countries, async (country) => {
+    await callback(country, { svgFile: country.flag, ...emojiFlags[country.alpha2Code] });
   });
 }
 
-const setCountry = async (country) => {
-  const insertedCountry = await session.run(
+const setCountry = async (country, flag) => {
+  await session.run(
     `
     CREATE (country:Country {
       name: $name,
@@ -29,13 +32,12 @@ const setCountry = async (country) => {
       alpha3Code: $alpha3Code,
       population: $population,
       demonym: $demonym,
+      capital: $capital,
       area: $area,
       gini: $gini,
       nativeName: $nativeName,
       numericCode: $numericCode,
-      cioc: $cioc,
-      latitude: $latitude,
-      longitude: $longitude
+      location: Point({latitude: $latitude, longitude: $longitude})
     })
     return ID(country)
     `, {
@@ -44,17 +46,19 @@ const setCountry = async (country) => {
       longitude: country.latlng[1] || 0,
     }
   );
-  // console.log('inserted country', country.name);
+  console.log(country.name);
   await createSimpleNodesAndLinkToIt('TopLevelDomain', 'hasTopLevelDomain', country.topLevelDomain, country.name);
   await createSimpleNodesAndLinkToIt('CallingCode', 'hasCallingCode', country.callingCodes, country.name);
   await createSimpleNodesAndLinkToIt('AlternativeSpelling', 'hasAlternativeSpelling', country.altSpellings, country.name);
   await createSimpleNodesAndLinkToIt('Timezone', 'hasTimezone', country.timezones, country.name);
   await createBorderRelationShip(country);
   await createRegions(country);
+  await createTranslatedCountryNames(country);
+  await createComplexNodesAndLinkToIt('Flag', 'hasFlag', [flag], country.name);
   await createComplexNodesAndLinkToIt('Language', 'hasOfficialLanguage', country.languages, country.name)
   await createComplexNodesAndLinkToIt('Currency', 'hasCurrency', country.currencies, country.name)
   await createComplexNodesAndLinkToIt('Currency', 'hasCurrency', country.currencies, country.name)
-  await createComplexNodesAndLinkToIt('RegionalBloc', 'hasRegionalBlocs', country.regionalBlocs, country.name)
+  await createRegionalBloc(country);
 }
 
 const createSimpleNodesAndLinkToIt = async (newNodeType, relationType, newNodeNames, countryName) => {
@@ -96,14 +100,52 @@ const createComplexNodesAndLinkToIt = async (newNodeType, relationType, newNodes
         countryName,
       }
     );
-    console.log(`inserted ${newNodeType}`, newNodeData);
+    // console.log(`inserted ${newNodeType}`, newNodeData);
   });
 }
 
-// const getIDProperty = (node) => {
-//   const firstKey = node.records[0].keys[0];
-//   return node.records[0].get(firstKey); 
-// }
+const createRegionalBloc = async (country) => {
+  await asyncForEach(country.regionalBlocs, async (regionalBloc) => {
+    await session.run(
+      `
+      MATCH (country:Country { name: $countryName })
+      MERGE (regionalBloc:RegionalBloc { acronym: $acronym, name: $regionalBlocName })
+      MERGE (country)-[r:hasRegionalBloc]->(regionalBloc)
+      `,
+      {
+        countryName: country.name,
+        regionalBlocName: regionalBloc.name,
+        acronym: regionalBloc.acronym,
+      }
+    );
+    await asyncForEach(regionalBloc.otherAcronyms, async otherAcronym => {
+      await session.run(
+        `
+        MATCH (regionalBloc:RegionalBloc { name: $regionalBlocName })
+        MERGE (otherAcronym:OtherAcronym { name: $otherAcronym })
+        MERGE (regionalBloc)-[r:hasOtherAcronym]->(otherAcronym)
+        `,
+        {
+          regionalBlocName: regionalBloc.name,
+          otherAcronym
+        }
+      );
+    });
+    await asyncForEach(regionalBloc.otherNames, async otherName => {
+      await session.run(
+        `
+        MATCH (regionalBloc:RegionalBloc { name: $regionalBlocName })
+        MERGE (otherName:OtherName { name: $otherName })
+        MERGE (regionalBloc)-[r:hasOtherName]->(otherName)
+        `,
+        {
+          regionalBlocName: regionalBloc.name,
+          otherName
+        }
+      );
+    });
+  });
+}
  
 const createBorderRelationShip = async ({ alpha3Code, borders }) => {
     await asyncForEach(borders, async (borderCode) => {
@@ -128,7 +170,7 @@ const createBorderRelationShip = async ({ alpha3Code, borders }) => {
   }
 
 const createRegions = async ({ name, region, subregion }) => {
-  if (region && subregion) {
+  if (region) {
     try {
       await session.run(
         `
@@ -136,12 +178,12 @@ const createRegions = async ({ name, region, subregion }) => {
         MERGE(subregion: Subregion { name: $subregion })
         MERGE(region: Region { name: $region })
         MERGE(country)-[:hasSubregion]->(subregion)
+        // MERGE(country)-[:hasRegion]->(region)
         MERGE(subregion)-[:hasRegion]->(region)
         `, {
           name, region, subregion
         }
       )
-      console.log(name, region, subregion);
     }
     catch(e) {
       console.log(e);
@@ -156,9 +198,30 @@ const makeUnits = async () => {
     CREATE(n3:Unit { name: 'SQUARE_MILES', value: 0.386102, unit: 'mi2' })
   `)
 }
+
+const createTranslatedCountryNames = async ({ translations, name }) => {
+  await asyncForEach(Object.keys(translations), async languageCode => {
+    const translationValue = translations[languageCode];
+    if (translationValue) {
+      await session.run(
+        `
+        MATCH(country: Country { name: $name })
+        MERGE(translation: Translation { value: $translationValue, languageCode: $languageCode })
+        MERGE(country)-[:hasLocale]->(translation)
+        `, {
+          name,
+          languageCode,
+          translationValue
+        }
+      )
+    }
+  });
+}
+
 (async () => {
   await resetDatabase();
   await makeUnits();
-  await getAllApiCountries(setCountry);
+  await getData(setCountry);
+  await inferNeo4jSchema();
   driver.close()
 })();

@@ -4,24 +4,95 @@ enum AreaUnit {
   SQUARE_MILES
 }
 
-
-type TopLevelDomain {
+type Country {
   _id: String!
+
+  "ISO 3166-1 alpha-2 codes are two-letter country codes defined in ISO 3166-1, part of the ISO 3166 standard published by the International Organization for Standardization (ISO), to represent countries, dependent territories, and special areas of geographical interest. https://en.m.wikipedia.org/wiki/ISO_3166-1_alpha-2"
+  alpha2Code: String!
+
+  "ISO 3166-1 alpha-3 codes are three-letter country codes defined in ISO 3166-1, part of the ISO 3166 standard published by the International Organization for Standardization (ISO), to represent countries, dependent territories, and special areas of geographical interest. https://en.m.wikipedia.org/wiki/ISO_3166-1_alpha-3"
+  alpha3Code: String!
+
+  "The area in square kilometer, you can convert the area unit and population density through the convertedArea property"
+  area: Float
+
+  capital: String!
+
+  "The population per square kilometer"
+  populationDensity: Float
+  @cypher(
+    statement: """
+      return this.population / this.area
+    """
+  )
+
+
+  convertedArea(areaUnit: AreaUnit = SQUARE_MILES): Area @relation(name: "NOTHING", direction: "IN")
+  @cypher(
+    statement: """
+      MATCH (unit:Unit { name: areaUnit })
+      return {
+        value: unit.value * this.area,
+        populationDensity: this.population / (unit.value * this.area),
+        unit: unit.unit
+      }
+    """
+  )
+
+  "identifies residents or natives of a particular place, usually derived from the name of the place or that of an ethnic group. https://en.m.wikipedia.org/wiki/Demonym"
+  demonym: String!
+
+  "In economics, the Gini coefficient, sometimes called the Gini index or Gini ratio, is a measure of statistical dispersion intended to represent the income or wealth distribution of a nation's residents, and is the most commonly used measurement of inequality. https://en.m.wikipedia.org/wiki/Gini_coefficient"
+  gini: Float
+
+  location: Point!
   name: String!
-  countries: [Country] @relation(name: "hasTopLevelDomain", direction: "IN")
+  nameTranslations: [Translation] @relation(name: "hasLocale", direction: "OUT")
+  nativeName: String!
+
+  numericCode: String
+  population: Float!
+
+  "A country code top-level domain (ccTLD) is an Internet top-level domain generally used or reserved for a country, sovereign state, or dependent territory identified with a country code. https://en.m.wikipedia.org/wiki/Country_code_top-level_domain"
+  topLevelDomains: [TopLevelDomain] @relation(name: "hasTopLevelDomain", direction: "OUT")
+  
+  callingCodes: [CallingCode] @relation(name: "hasCallingCode", direction: "OUT")
+  alternativeSpellings: [AlternativeSpelling] @relation(name: "hasAlternativeSpelling", direction: "OUT")
+  timezones: [Timezone] @relation(name: "hasTimezone", direction: "OUT")
+  borders: [Country] @relation(name: "borders", direction: "OUT")
+  subregion: Subregion @relation(name: "hasSubregion", direction: "OUT")
+  # region: Region @relation(name: "hasRegion", direction: "OUT")
+  officialLanguages: [Language] @relation(name: "hasOfficialLanguage", direction: "OUT")
+  currencies: [Currency] @relation(name: "hasCurrency", direction: "OUT")
+  regionalBlocs: [RegionalBloc] @relation(name: "hasRegionalBlocs", direction: "OUT")
+  flag: Flag @relation(name: "hasFlag", direction: "OUT")
+
+  distanceToOtherCountries: [DistanceToOtherCountry] @relation(name: "NOTHING", direction: "IN")
+  @cypher(
+    statement: """
+      MATCH(country:Country)
+      WHERE NOT this = country
+      WITH (distance(this.location, country.location) / 1000) as distanceInKm, country
+      ORDER BY distanceInKm
+      RETURN { distanceInKm: distanceInKm, countryName: country.name }
+    """
+  )
+
+
+
+  "Shortest path to go from one country to another with the least border crossing as possible"
+  shortestPathToOtherCountry(otherCountryAlpha2Code: String!): [Country] @relation(name: "borders", direction: "OUT")
+  @cypher(
+    statement: """
+      MATCH (to:Country {alpha2Code: $otherCountryAlpha2Code})
+      WHERE NOT this = to
+      MATCH p = shortestPath((this)-[:borders*]-(to))
+      UNWIND nodes(p) as n
+      RETURN distinct n
+    """
+  )
 }
 
-type CallingCode {
-  _id: String!
-  name: String!
-  countries: [Country] @relation(name: "hasCallingCode", direction: "IN")
-}
-
-type AlternativeSpelling {
-  _id: String!
-  name: String!
-  countries: [Country] @relation(name: "hasAlternativeSpelling", direction: "IN")
-}
 
 type Timezone {
   _id: String!
@@ -63,9 +134,21 @@ type RegionalBloc {
   _id: String!
   acronym: String!
   name: String!
-  otherAcronyms: String!
-  otherNames: String!
+  otherAcronyms: [OtherAcronym] @relation(name: "hasOtherAcronym", direction: "OUT")
+  otherNames: [OtherName] @relation(name: "hasOtherName", direction: "OUT")
   countries: [Country] @relation(name: "hasRegionalBlocs", direction: "IN")
+}
+
+type OtherAcronym {
+   _id: String!
+   name: String!
+   regionalBlocs: [RegionalBloc] @relation(name: "hasOtherAcronym", direction: "IN")
+}
+
+type OtherName {
+   _id: String!
+   name: String!
+   regionalBlocs: [RegionalBloc] @relation(name: "hasOtherName", direction: "IN")
 }
 
 type Area {
@@ -75,52 +158,40 @@ type Area {
   populationDensity: Float
 }
 
-type Country {
+type Translation {
   _id: String!
-  alpha2Code: String!
-  alpha3Code: String!
-  "The area in square kilometer, you can convert the area unit and population density through the convertedArea property"
-  area: Float
-  "The population per square kilometer"
-  populationDensity: Float
-  @cypher(
-    statement: """
-      return this.population / this.area
-    """
-  )
+  languageCode: String!
+  value: String!
+}
 
+type Flag {
+   _id: String!
+   emoji: String!
+   emojiUnicode: String!
+   svgFile: String!
+   country: Country @relation(name: "hasFlag", direction: "IN")
+}
 
-  convertedArea(areaUnit: AreaUnit = SQUARE_MILES): Area @relation(name: "NOTHING", direction: "IN")
-  @cypher(
-    statement: """
-      MATCH (unit:Unit { name: areaUnit })
-      return {
-        value: unit.value * this.area,
-        populationDensity: this.population / (unit.value * this.area),
-        unit: unit.unit
-      }
-    """
-  )
+type DistanceToOtherCountry {
+  distanceInKm: Float
+  "Sorry can't return the full country type :/"
+  countryName: String
+}
 
-  "identifies residents or natives of a particular place, usually derived from the name of the place or that of an ethnic group. https://en.m.wikipedia.org/wiki/Demonym"
-  demonym: String!
-
-  "In economics, the Gini coefficient, sometimes called the Gini index or Gini ratio, is a measure of statistical dispersion intended to represent the income or wealth distribution of a nation's residents, and is the most commonly used measurement of inequality. https://en.m.wikipedia.org/wiki/Gini_coefficient"
-  gini: Float
-
-  latitude: Float!
-  longitude: Float!
+type TopLevelDomain {
+  _id: String!
   name: String!
-  nativeName: String!
-  numericCode: String
-  population: Float!
-  topLevelDomains: [TopLevelDomain] @relation(name: "hasTopLevelDomain", direction: "OUT")
-  callingCodes: [CallingCode] @relation(name: "hasCallingCode", direction: "OUT")
-  alternativeSpellings: [AlternativeSpelling] @relation(name: "hasAlternativeSpelling", direction: "OUT")
-  timezones: [Timezone] @relation(name: "hasTimezone", direction: "OUT")
-  borders: [Country] @relation(name: "borders", direction: "OUT")
-  subregion: Subregion @relation(name: "hasSubregion", direction: "OUT")
-  officialLanguages: [Language] @relation(name: "hasOfficialLanguage", direction: "OUT")
-  currencies: [Currency] @relation(name: "hasCurrency", direction: "OUT")
-  regionalBlocs: [RegionalBloc] @relation(name: "hasRegionalBlocs", direction: "OUT")
+  countries: [Country] @relation(name: "hasTopLevelDomain", direction: "IN")
+}
+
+type CallingCode {
+  _id: String!
+  name: String!
+  countries: [Country] @relation(name: "hasCallingCode", direction: "IN")
+}
+
+type AlternativeSpelling {
+  _id: String!
+  name: String!
+  countries: [Country] @relation(name: "hasAlternativeSpelling", direction: "IN")
 }
