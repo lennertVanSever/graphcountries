@@ -1,1 +1,1 @@
-web: node ./src/graphql/index.js
+web: node ./build/graphql/index.js
