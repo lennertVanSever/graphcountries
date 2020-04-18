@@ -19,7 +19,7 @@
     "dotenv": "^8.2.0",
     "graphql-import": "^1.0.2",
     "html2json": "^1.0.2",
-    "neo4j-driver": "^4.0.2",
+    "neo4j-driver": "1.7.4",
     "neo4j-graphql-js": "^2.13.0",
     "node-fetch": "^2.6.0",
     "tabletojson": "^2.0.4"

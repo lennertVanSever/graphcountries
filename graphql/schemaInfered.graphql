@@ -1,3 +1,38 @@
+type Country {
+   _id: Long!
+   alpha2Code: String!
+   alpha3Code: String!
+   area: Float
+   capital: String!
+   demonym: String!
+   gini: Float
+   location: Point!
+   name: String!
+   nativeName: String!
+   numericCode: String
+   population: Float!
+   hasofficiallanguage: [Language] @relation(name: "hasOfficialLanguage", direction: "OUT")
+   hastopleveldomain: [TopLevelDomain] @relation(name: "hasTopLevelDomain", direction: "OUT")
+   hascallingcode: [CallingCode] @relation(name: "hasCallingCode", direction: "OUT")
+   hasalternativespelling: [AlternativeSpelling] @relation(name: "hasAlternativeSpelling", direction: "OUT")
+   hastimezone: [Timezone] @relation(name: "hasTimezone", direction: "OUT")
+   hassubregion: [Subregion] @relation(name: "hasSubregion", direction: "OUT")
+   haslocale: [Translation] @relation(name: "hasLocale", direction: "OUT")
+   hasflag: [Flag] @relation(name: "hasFlag", direction: "OUT")
+   hascurrency: [Currency] @relation(name: "hasCurrency", direction: "OUT")
+   hasregionalbloc: [RegionalBloc] @relation(name: "hasRegionalBloc", direction: "OUT")
+   borders: [Country] @relation(name: "borders", direction: "OUT")
+}
+
+type Language {
+   _id: Long!
+   iso639_1: String!
+   iso639_2: String!
+   name: String!
+   nativeName: String!
+   countrys: [Country] @relation(name: "hasOfficialLanguage", direction: "IN")
+}
+
 type TopLevelDomain {
    _id: Long!
    name: String!
@@ -35,13 +70,19 @@ type Region {
    subregions: [Subregion] @relation(name: "hasRegion", direction: "IN")
 }
 
-type Language {
+type Translation {
    _id: Long!
-   iso639_1: String!
-   iso639_2: String!
-   name: String!
-   nativeName: String!
-   countrys: [Country] @relation(name: "hasOfficialLanguage", direction: "IN")
+   languageCode: String!
+   value: String!
+   countrys: [Country] @relation(name: "hasLocale", direction: "IN")
+}
+
+type Flag {
+   _id: Long!
+   emoji: String!
+   emojiUnicode: String!
+   svgFile: String!
+   countrys: [Country] @relation(name: "hasFlag", direction: "IN")
 }
 
 type Currency {
@@ -56,29 +97,9 @@ type RegionalBloc {
    _id: Long!
    acronym: String!
    name: String!
-   hasotheracronym: [OtherAcronym] @relation(name: "hasOtherAcronym", direction: "OUT")
    hasothername: [OtherName] @relation(name: "hasOtherName", direction: "OUT")
+   hasotheracronym: [OtherAcronym] @relation(name: "hasOtherAcronym", direction: "OUT")
    countrys: [Country] @relation(name: "hasRegionalBloc", direction: "IN")
-}
-
-type Unit {
-   _id: Long!
-   name: String!
-   unit: String!
-   value: String!
-}
-
-type Translation {
-   _id: Long!
-   languageCode: String!
-   value: String!
-   countrys: [Country] @relation(name: "hasLocale", direction: "IN")
-}
-
-type OtherAcronym {
-   _id: Long!
-   name: String!
-   regionalblocs: [RegionalBloc] @relation(name: "hasOtherAcronym", direction: "IN")
 }
 
 type OtherName {
@@ -87,38 +108,17 @@ type OtherName {
    regionalblocs: [RegionalBloc] @relation(name: "hasOtherName", direction: "IN")
 }
 
-type Flag {
+type OtherAcronym {
    _id: Long!
-   emoji: String!
-   emojiUnicode: String!
-   svgFile: String!
-   countrys: [Country] @relation(name: "hasFlag", direction: "IN")
+   name: String!
+   regionalblocs: [RegionalBloc] @relation(name: "hasOtherAcronym", direction: "IN")
 }
 
-type Country {
+type Unit {
    _id: Long!
-   alpha2Code: String!
-   alpha3Code: String!
-   area: Float
-   capital: String!
-   demonym: String!
-   gini: Float
-   location: Point!
    name: String!
-   nativeName: String!
-   numericCode: String
-   population: Float!
-   hastopleveldomain: [TopLevelDomain] @relation(name: "hasTopLevelDomain", direction: "OUT")
-   hascallingcode: [CallingCode] @relation(name: "hasCallingCode", direction: "OUT")
-   hasalternativespelling: [AlternativeSpelling] @relation(name: "hasAlternativeSpelling", direction: "OUT")
-   hastimezone: [Timezone] @relation(name: "hasTimezone", direction: "OUT")
-   borders: [Country] @relation(name: "borders", direction: "OUT")
-   hassubregion: [Subregion] @relation(name: "hasSubregion", direction: "OUT")
-   hasofficiallanguage: [Language] @relation(name: "hasOfficialLanguage", direction: "OUT")
-   hascurrency: [Currency] @relation(name: "hasCurrency", direction: "OUT")
-   haslocale: [Translation] @relation(name: "hasLocale", direction: "OUT")
-   hasregionalbloc: [RegionalBloc] @relation(name: "hasRegionalBloc", direction: "OUT")
-   hasflag: [Flag] @relation(name: "hasFlag", direction: "OUT")
+   unit: String!
+   value: String!
 }
 
 
