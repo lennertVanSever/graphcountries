@@ -76,30 +76,30 @@ type Country {
   regionalBlocs: [RegionalBloc] @relation(name: "hasRegionalBlocs", direction: "OUT")
   flag: Flag @relation(name: "hasFlag", direction: "OUT")
 
-  # distanceToOtherCountries: [DistanceToOtherCountry] @relation(name: "NOTHING", direction: "IN")
-  # @cypher(
-  #   statement: """
-  #     MATCH(country:Country)
-  #     WHERE NOT this = country
-  #     WITH (distance(this.location, country.location) / 1000) as distanceInKm, country
-  #     ORDER BY distanceInKm
-  #     RETURN { distanceInKm: distanceInKm, countryName: country.name }
-  #   """
-  # )
+  distanceToOtherCountries: [DistanceToOtherCountry] @relation(name: "NOTHING", direction: "IN")
+  @cypher(
+    statement: """
+      MATCH(country:Country)
+      WHERE NOT this = country
+      WITH (distance(this.location, country.location) / 1000) as distanceInKm, country
+      ORDER BY distanceInKm
+      RETURN { distanceInKm: distanceInKm, countryName: country.name }
+    """
+  )
 
 
 
-  # "Shortest path to go from one country to another with the least border crossing as possible"
-  # shortestPathToOtherCountry(otherCountryAlpha2Code: String!): [Country] @relation(name: "borders", direction: "OUT")
-  # @cypher(
-  #   statement: """
-  #     MATCH (to:Country {alpha2Code: $otherCountryAlpha2Code})
-  #     WHERE NOT this = to
-  #     MATCH p = shortestPath((this)-[:borders*]-(to))
-  #     UNWIND nodes(p) as n
-  #     RETURN distinct n
-  #   """
-  # )
+  "Shortest path to go from one country to another with the least border crossing as possible"
+  shortestPathToOtherCountry(otherCountryAlpha2Code: String!): [Country] @relation(name: "borders", direction: "OUT")
+  @cypher(
+    statement: """
+      MATCH (to:Country {alpha2Code: $otherCountryAlpha2Code})
+      WHERE NOT this = to
+      MATCH p = shortestPath((this)-[:borders*]-(to))
+      UNWIND nodes(p) as n
+      RETURN distinct n
+    """
+  )
 }
 
 
