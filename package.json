@@ -7,6 +7,8 @@
     "clean": "rm -rf build && mkdir build",
     "build-babel": "babel -d ./build ./src -s",
     "build": "npm run clean && npm run build-babel",
+    "deploy": "npm run build && gcloud app deploy --quiet",
+    "logs": "gcloud app logs read",
     "start": "node ./build/graphql/index.js",
     "dev": "npm run build && npm start",
     "dataScraping": "babel-node -- ./src/dataScraping/index.js",
