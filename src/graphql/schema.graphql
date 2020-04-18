@@ -73,7 +73,7 @@ type Country {
   # region: Region @relation(name: "hasRegion", direction: "OUT")
   officialLanguages: [Language] @relation(name: "hasOfficialLanguage", direction: "OUT")
   currencies: [Currency] @relation(name: "hasCurrency", direction: "OUT")
-  regionalBlocs: [RegionalBloc] @relation(name: "hasRegionalBlocs", direction: "OUT")
+  regionalBlocs: [RegionalBloc] @relation(name: "hasRegionalBloc", direction: "OUT")
   flag: Flag @relation(name: "hasFlag", direction: "OUT")
 
   distanceToOtherCountries: [DistanceToOtherCountry] @relation(name: "NOTHING", direction: "IN")
