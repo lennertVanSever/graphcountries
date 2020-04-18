@@ -59,7 +59,16 @@ type Country {
   callingCodes: [CallingCode] @relation(name: "hasCallingCode", direction: "OUT")
   alternativeSpellings: [AlternativeSpelling] @relation(name: "hasAlternativeSpelling", direction: "OUT")
   timezones: [Timezone] @relation(name: "hasTimezone", direction: "OUT")
-  borders: [Country] @relation(name: "borders", direction: "OUT")
+
+  borders: [Country] @relation(name: "borders", direction: "IN")
+  @cypher(
+    statement: """
+      MATCH(country:Country)
+      MATCH(this)-[r:borders]-(country)
+      return country
+    """
+  )
+
   subregion: Subregion @relation(name: "hasSubregion", direction: "OUT")
   # region: Region @relation(name: "hasRegion", direction: "OUT")
   officialLanguages: [Language] @relation(name: "hasOfficialLanguage", direction: "OUT")
