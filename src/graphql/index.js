@@ -5,7 +5,7 @@ import { driver } from '../neo4j/index.js';
 import fs from 'fs';
 
 
-fs.readFile('./graphql/schema.graphql', (error, result) => {
+fs.readFile('./src/graphql/schema.graphql', (error, result) => {
   if (error) {
     console.error(error);
   } else {
@@ -32,7 +32,7 @@ fs.readFile('./graphql/schema.graphql', (error, result) => {
         apiKey: "service:graphql-countries:MHaMUmJGfYSddSP_IU5Iqg",
       }
     });
-    const port = process.env.GRAPHQL_LISTEN_PORT || 8080;
+    const port = process.env.PORT || 8080;
     
     server.listen(port, '0.0.0.0').then(({ url }) => {
       console.log(`GraphQL API ready at ${url}`);

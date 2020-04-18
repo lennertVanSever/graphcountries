@@ -4,9 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "clean": "rm -rf build && mkdir build",
+    "build-babel": "babel -d ./build ./src -s",
+    "build": "npm run clean && npm run build-babel",
     "start": "npm run graphql",
-    "graphql": "nodemon --exec babel-node -- ./graphql/index.js",
-    "dataScraping": "babel-node -- ./dataScraping/index.js",
+    "graphql": "nodemon --exec babel-node -- ./src/graphql/index.js",
+    "dataScraping": "babel-node -- ./src/dataScraping/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
