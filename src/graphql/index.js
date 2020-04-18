@@ -30,7 +30,9 @@ fs.readFile('./src/graphql/schema.graphql', (error, result) => {
       },
       engine: {
         apiKey: "service:graphql-countries:MHaMUmJGfYSddSP_IU5Iqg",
-      }
+      },
+      introspection: true,
+      playground: true,
     });
     const port = process.env.PORT || 8080;
     
