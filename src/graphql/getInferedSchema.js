@@ -4,5 +4,5 @@ import fs from 'fs';
 
 export const inferNeo4jSchema = async () => {
   const { typeDefs } = await inferSchema(driver, { alwaysIncludeRelationships: false });
-  fs.writeFileSync('./graphql/schemaInfered.graphql', typeDefs);
+  fs.writeFileSync('./src/graphql/schemaInfered.graphql', typeDefs);
 }
