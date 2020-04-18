@@ -14,7 +14,7 @@ fs.readFile('./src/graphql/schema.graphql', (error, result) => {
       typeDefs,
       config: {
         query: {
-          exclude: ["AlternativeSpelling", "Area", "OtherAcronym", "OtherName", "Translation", "DistanceToOtherCountry"]
+          exclude: ["AlternativeSpelling", "Area", "OtherAcronym", "OtherName"]
         },
         mutation: false
       }
