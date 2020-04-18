@@ -10,3 +10,11 @@ MATCH p=shortestPath((a)-[:borders*]-(b))
 WITH length(p) AS len, p
 ORDER BY len DESC LIMIT 1
 RETURN p
+
+
+CREATE USER public
+SET PASSWORD 'public' CHANGE NOT REQUIRED
+SET STATUS ACTIVE
+
+
+SHOW ALL ROLES
