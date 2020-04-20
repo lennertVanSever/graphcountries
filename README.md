@@ -1,5 +1,5 @@
 # Graph countries
-Use GraphQL to query country related data, free of charge and without restrictions. The data is the same as [restcountries.eu](https://restcountries.eu/) with extra emoji's for [flags](https://countries-274616.ew.r.appspot.com/?query=query%20%7B%0A%20%20Flag%20%7B%0A%20%20%20%20emoji%0A%20%20%20%20country%20%7B%0A%20%20%20%20%20%20name%0A%20%20%20%20%7D%0A%20%20%7D%0A%7D%0A) because who doesn't like emoji's?
+Use GraphQL to query country-related data, free of charge and without restrictions. The data is the same as [restcountries.eu](https://restcountries.eu/) with extra emoji's for [flags](https://countries-274616.ew.r.appspot.com/?query=query%20%7B%0A%20%20Flag%20%7B%0A%20%20%20%20emoji%0A%20%20%20%20country%20%7B%0A%20%20%20%20%20%20name%0A%20%20%20%20%7D%0A%20%20%7D%0A%7D%0A) because who doesn't like emoji's?
 
 
 ### [Explore the playground](https://countries-274616.ew.r.appspot.com/?query=query%20%7B%0A%09Country%20%7B%0A%20%20%20%20name%0A%20%20%20%20%23%20check%20the%20docs%20for%20more%20info%0A%20%20%7D%0A%7D%0A)
