@@ -74,3 +74,7 @@ Getting started:
 4. Populate the Neo4j graph database, run `npm run dataScrAPIng`. When this command is done, you will get an infered schema file in the graphql repo, you can use this to optionally change the main schema.graphql file in the same repo
 5. Start the GraphQL in dev mode, run `npm run dev`
 6. Visit [http://localhost:8080/](http://localhost:8080/) to discover your self hosted API, have fun!
+
+## Graphql voyager
+
+You can also explore the schema with [graphql-voyager](https://graph-countries-voyager.netlify.app/)
