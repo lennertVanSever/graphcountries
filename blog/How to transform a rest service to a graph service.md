@@ -151,7 +151,7 @@ Try to get some insights into your data by performing some graph algorithms. I f
 
 The longest shortest path between all the bordering countries in the world is the following:
 
-![graph shortest path](/Users/zasevele/Downloads/graph shortest path.png)
+![longest shortest path between all bordering countries](./images/bordering-countries-all-shortest-path.png)
 
 
 
@@ -167,7 +167,7 @@ RETURN p
 
 Top 10 languages that are used in different countries, notice how this correlates with the largest kingdoms in our recent history
 
-![language as official languages](/Users/zasevele/Downloads/language as official languages.png)
+![Top 10 official languages on a country base](./images/top-10-official-languages.png)
 
 ```cypher
 MATCH (country:Country)
@@ -182,7 +182,7 @@ LIMIT 10
 
 You can also discover interesting patterns by just browsing your graph, for example, countries with Portuguese as there official language never border each other.
 
- ![graph portuguese](/Users/zasevele/Downloads/graph portuguese.png)
+ ![Countries with Portuguese as there official language](./images/portuguese-official-language.png)
 
 
 
