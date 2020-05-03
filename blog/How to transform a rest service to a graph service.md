@@ -163,7 +163,7 @@ ORDER BY len DESC LIMIT 1
 RETURN p
 ```
 
-
+---
 
 Top 10 languages that are used in different countries, notice how this correlates with the largest kingdoms in our recent history
 
@@ -178,15 +178,11 @@ RETURN DISTINCT(language.name), countryCount
 LIMIT 10
 ```
 
-
+---
 
 You can also discover interesting patterns by just browsing your graph, for example, countries with Portuguese as there official language never border each other.
 
 ![Countries with Portuguese as there official language](./images/portuguese-official-language.png)
-
-
-
-
 
 On the oposite side, Arab speaking countries always have a bordering country that also have Arab as an official language if you exclude the island nations of Bahrain and the Comores.
 
