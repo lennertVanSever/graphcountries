@@ -1,4 +1,4 @@
-
+![Neo4j logo and GraphQL logo](./images/banner.png)
 
 # How to transform a rest service to a graph service
 
