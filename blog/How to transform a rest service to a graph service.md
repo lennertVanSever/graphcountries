@@ -182,7 +182,15 @@ LIMIT 10
 
 You can also discover interesting patterns by just browsing your graph, for example, countries with Portuguese as there official language never border each other.
 
- ![Countries with Portuguese as there official language](./images/portuguese-official-language.png)
+![Countries with Portuguese as there official language](./images/portuguese-official-language.png)
+
+
+
+
+
+On the oposite side, Arab speaking countries always have a bordering country that also have Arab as an official language if you exclude the island nations of Bahrain and the Comores.
+
+![Countries with Arabic as there official language](./images/arabic-official-language.png)
 
 
 
@@ -194,4 +202,4 @@ Thanks to the generated GraphQL API, I was able to overcome the limitations of t
 * The search, filter and sorting options are amazing. Give me all the countries with a population of 10 million or less. [All done and sorted by population](https://countries-274616.ew.r.appspot.com/?query=query%20%7B%0A%09Country%28filter%3A%20%7B%20population_lte%3A%2010000000%20%7D%2C%20orderBy%3A%20population_desc%29%20%7B%0A%20%20%20%20name%0A%20%20%20%20population%0A%20%20%7D%0A%7D%0A). Give me all the countries on the UTC timezone. [This is the result](https://countries-274616.ew.r.appspot.com/?query=query%20%7B%0A%09Timezone%28name%3A%20%22UTC%22%29%20%7B%0A%20%20%20%20name%0A%20%20%20%20countries%20%7B%0A%20%20%20%20%20%20name%0A%20%20%20%20%7D%0A%20%20%7D%0A%7D%0A).
 * Because of the nature of GraphQL, I can query exactly what I want so no under or over fetching.
 
-Next to an easy to use API, I can do some data analytics through graph algorithms to get some more insights into my domain.
+Next to an easy to use API, I can do some data analytics through graph algorithms to get some more insights into my domain which was impossible through the REST service.
