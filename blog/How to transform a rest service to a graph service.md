@@ -21,7 +21,7 @@ I took the following steps to effectively transform REST countries to a graph se
 
 To get started you will need to insert all the data from the REST service in the Neo4j graph database. Before you do that, take a step back and think about how you will structure your graph, just drawing some circles and lines with pen and paper or a whiteboard should do the trick, once you are done with that you can take your sketch to the next level with a tool like [draw.io]([draw.io]())
 
-![country graph (2)](/Users/zasevele/Downloads/country graph (2).png)
+![draw io countries graph model](./blog/images/draw-io-example.png)
 
 Deciding what should be a node, a property or a relationship can be tricky, what helps is to look at how the REST service is structured. Many-to-many or one-to-many relationships like objects in an array deserve separate nodes. Try to  name all your different types of nodes and relationships as soon as possible.
 
