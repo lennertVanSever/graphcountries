@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Neovis.js Simple Example</title>
+        <style type="text/css">
+            html, body {
+                font: 16pt arial;
+            }
+            * {
+              margin: 0;
+              padding: 0;
+            }
+            #viz {
+                width: 100vw;
+                height: 100vh;
+                border: 1px solid lightgray;
+                font: 22pt arial;
+            }
+        </style>
+        <script src="https://rawgit.com/neo4j-contrib/neovis.js/master/dist/neovis.js"></script>
+        <script type="text/javascript">
+
+          var viz;
+  
+          function draw() {
+              var config = {
+                  container_id: "viz",
+                  server_url: "bolt://localhost:11003",
+                  server_user: "neo4j",
+                  server_password: "countries",
+                  labels: {
+                      "Country": {
+                          "caption": "name",
+                          "size": "centrality",
+                          "community": "community",
+                      }
+                  },
+                  relationships: {
+                      "borders": {
+                          "thickness": "weight",
+                          "caption": false
+                      }
+                  },
+                  initial_cypher: `
+                  MATCH (country:Country)-[r:borders]-()
+                  RETURN country, r
+                  `
+              };
+  
+              viz = new NeoVis.default(config);
+              viz.render();
+          }
+      </script>
+    </head>
+    <body onload="draw()">
+        <div id="viz"></div>
+    </body>    
+</html>
