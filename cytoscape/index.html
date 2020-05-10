@@ -5,7 +5,6 @@
     <style type="text/css">
       html, body {
           font: 16pt arial;
-          background-color:#4E6886;
       }
       * {
         margin: 0;
@@ -14,6 +13,7 @@
       #cy {
           width: 100vw;
           height: 100vh;
+          background-color:#4E6886;
       }
     </style>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.14.2/cytoscape.min.js'></script>
@@ -39,7 +39,7 @@
                   x: longitude
                 }
                 flag {
-                  emoji
+                  svgFile
                 }
                 borders {
                   alpha2Code
@@ -56,14 +56,15 @@
 
         const elements = (() => {
           let output = [];
+          let relationships = [];
           data.countries.forEach((country) => {
-            const relationships = country.borders.map(({ alpha2Code: borderingCountryAlpha2Code }) => ({
+            relationships = [...country.borders.map(({ alpha2Code: borderingCountryAlpha2Code }) => ({
               data: {
                 id: `${country.alpha2Code}${borderingCountryAlpha2Code}`,
                 source: country.alpha2Code,
                 target: borderingCountryAlpha2Code
               },
-            }))
+            })), ...relationships]
             output = [
               {
                 data: {
@@ -71,7 +72,7 @@
                   name: country.name,
                   area: country.area,
                   centrality: country.centrality,
-                  flag: country.flag.emoji,
+                  flag: country.flag.svgFile,
                   parent: country.community,
                 },
                 renderedPosition: {
@@ -80,7 +81,6 @@
                 },
                 locked: true
               },
-              ...relationships,
               ...output
             ]
           });
@@ -96,6 +96,18 @@
               ]
             }
           })
+          console.log(relationships);
+          relationships = relationships.filter((relationship, index) => {
+            let unique = true;
+            relationships.forEach((relationShipToCheck, indexCheck) => {
+              if (relationShipToCheck.source === relationship.target && relationShipToCheck.target === relationship.source && index !== indexCheck) {
+                unique = false;
+              }
+            });
+            console.log(unique);
+            return unique;
+          })
+          output = [...relationships, ...output]
           return output;
         })();
 
@@ -109,22 +121,24 @@
               {
                 selector: "node",
                 css: {
-                  label: "data(flag)",
-                  'color': 'white',
-                  'font-size': (node) => `${mapRange(node.data('centrality'), 0, 37, 5, 85)}px`,
+                  label: "data(name)",
+                  'color': '#eaeaea',
+                  'background-image': "data(flag)",
+                  'background-fit': 'cover',
+                  'font-size': (node) => `${mapRange(node.data('centrality'), 0, 37, 5, 20)}px`,
                   width: mapSize,
                   height: mapSize,
                   'background-color': '#F6DFC7',
                   'text-wrap': 'ellipsis',
-                  'text-halign': "center",
-                  'text-valign': "center",
-                  // 'text-max-width': '100px'
+                  // 'text-halign': "center",
+                  'text-valign': "bottom",
+                  'text-max-width': '150px'
                 }
               },
               {
                 selector: '$node > node',
                 css: {
-                  'background-color': '#4E6886'
+                  'background-color': '#4E6886',
                 }
               },
               {
@@ -134,9 +148,33 @@
                   'line-color': '#A87C9A',
                   // 'line-style': 'dashed'
                 }
+              },
+              {
+                selector: "edge:selected",
+                css: {
+                  width: '5px',
+                  'line-color': 'white',
+                  // 'line-style': 'dashed'
+                }
+              },
+              {
+                selector: ".asdfasdf",
+                css: {
+                  width: '2px',
+                  'line-color': 'white',
+                  // 'line-style': 'dashed'
+                }
               }
             ],
+
           });
+
+          var dfs = cy.elements().aStar({
+            root: '#BE',
+            goal: '#IR',
+            directed: true
+          });
+          dfs.path.select()
       })()
 
     </script>
