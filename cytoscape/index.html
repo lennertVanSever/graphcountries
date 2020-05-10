@@ -58,13 +58,29 @@
           let output = [];
           let relationships = [];
           data.countries.forEach((country) => {
-            relationships = [...country.borders.map(({ alpha2Code: borderingCountryAlpha2Code }) => ({
-              data: {
-                id: `${country.alpha2Code}${borderingCountryAlpha2Code}`,
-                source: country.alpha2Code,
-                target: borderingCountryAlpha2Code
-              },
-            })), ...relationships]
+            country.borders.forEach(({ alpha2Code: borderingCountryAlpha2Code }) => {
+
+              let alreadyExists = false;
+              relationships.forEach((relationShipToCheck) => {
+                if (relationShipToCheck.data.target === country.alpha2Code && relationShipToCheck.data.source === borderingCountryAlpha2Code) {
+                  alreadyExists = true;
+                }
+              });
+              console.log(alreadyExists);
+              if (!alreadyExists) {
+                relationships = [
+                  {
+                    data: {
+                      id: `${country.alpha2Code}${borderingCountryAlpha2Code}`,
+                      source: country.alpha2Code,
+                      target: borderingCountryAlpha2Code
+                    },
+                  },
+                  ...relationships
+                ]
+              }
+            });
+            
             output = [
               {
                 data: {
@@ -97,16 +113,16 @@
             }
           })
           console.log(relationships);
-          relationships = relationships.filter((relationship, index) => {
-            let unique = true;
-            relationships.forEach((relationShipToCheck, indexCheck) => {
-              if (relationShipToCheck.source === relationship.target && relationShipToCheck.target === relationship.source && index !== indexCheck) {
-                unique = false;
-              }
-            });
-            console.log(unique);
-            return unique;
-          })
+          // relationships = relationships.filter((relationship, index) => {
+          //   let unique = true;
+          //   relationships.forEach((relationShipToCheck, indexCheck) => {
+          //     if (relationShipToCheck.source === relationship.target && relationShipToCheck.target === relationship.source && index !== indexCheck) {
+          //       unique = false;
+          //     }
+          //   });
+          //   console.log(unique);
+          //   return unique;
+          // })
           output = [...relationships, ...output]
           return output;
         })();
@@ -132,7 +148,7 @@
                   'text-wrap': 'ellipsis',
                   // 'text-halign': "center",
                   'text-valign': "bottom",
-                  'text-max-width': '150px'
+                  'text-max-width': '150px',
                 }
               },
               {
@@ -146,33 +162,24 @@
                 css: {
                   width: '2px',
                   'line-color': '#A87C9A',
-                  // 'line-style': 'dashed'
+                  'line-style': 'dashed'
                 }
               },
               {
                 selector: "edge:selected",
                 css: {
-                  width: '5px',
+                  width: '3px',
                   'line-color': 'white',
-                  // 'line-style': 'dashed'
+                  'line-style': 'solid'
                 }
               },
-              {
-                selector: ".asdfasdf",
-                css: {
-                  width: '2px',
-                  'line-color': 'white',
-                  // 'line-style': 'dashed'
-                }
-              }
             ],
 
           });
 
           var dfs = cy.elements().aStar({
-            root: '#BE',
-            goal: '#IR',
-            directed: true
+            root: '#CA',
+            goal: '#LS',
           });
           dfs.path.select()
       })()
