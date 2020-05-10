@@ -12,6 +12,7 @@
     "start": "node ./build/graphql/index.js",
     "dev": "npm run build && npm start",
     "dataScraping": "babel-node -- ./src/dataScraping/index.js",
+    "inferSchema": "babel-node -- ./src/graphql/getInferedSchema.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

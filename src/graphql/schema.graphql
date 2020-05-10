@@ -75,6 +75,8 @@ type Country {
   currencies: [Currency] @relation(name: "hasCurrency", direction: "OUT")
   regionalBlocs: [RegionalBloc] @relation(name: "hasRegionalBloc", direction: "OUT")
   flag: Flag @relation(name: "hasFlag", direction: "OUT")
+  centrality: Float!
+  community: Int!
 
   distanceToOtherCountries: [DistanceToOtherCountry] @relation(name: "NOTHING", direction: "IN")
   @cypher(

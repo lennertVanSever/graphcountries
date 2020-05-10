@@ -1,0 +1,144 @@
+<!doctype html>
+<html>
+<head>
+    <title>Tutorial 1: Getting Started</title>
+    <style type="text/css">
+      html, body {
+          font: 16pt arial;
+          background-color:#4E6886;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      #cy {
+          width: 100vw;
+          height: 100vh;
+      }
+    </style>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.14.2/cytoscape.min.js'></script>
+</head>
+
+<body>
+    <div id="cy"></div>
+    <script>
+      (async () => {
+        const response = await fetch('http://0.0.0.0:8080/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: `
+            query {
+              countries: Country {
+                name
+                alpha2Code
+                area
+                community
+                centrality
+                location {
+                  y: latitude
+                  x: longitude
+                }
+                flag {
+                  emoji
+                }
+                borders {
+                  alpha2Code
+                }
+              }
+            }
+        ` }),
+        });
+        const { data } = await response.json();
+
+        function mapRange(value, low1, high1, low2, high2) {
+            return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
+        }
+
+        const elements = (() => {
+          let output = [];
+          data.countries.forEach((country) => {
+            const relationships = country.borders.map(({ alpha2Code: borderingCountryAlpha2Code }) => ({
+              data: {
+                id: `${country.alpha2Code}${borderingCountryAlpha2Code}`,
+                source: country.alpha2Code,
+                target: borderingCountryAlpha2Code
+              },
+            }))
+            output = [
+              {
+                data: {
+                  id: country.alpha2Code,
+                  name: country.name,
+                  area: country.area,
+                  centrality: country.centrality,
+                  flag: country.flag.emoji,
+                  parent: country.community,
+                },
+                renderedPosition: {
+                  x: mapRange(country.location.x, -180, 180, 0, 5000),
+                  y: mapRange(country.location.y, 90, -90, 0, 2500),
+                },
+                locked: true
+              },
+              ...relationships,
+              ...output
+            ]
+          });
+          output.forEach(({ data: { parent }}) => {
+            if (parent) {
+              output = [
+                {
+                  data: {
+                    id: parent
+                  }
+                },
+                ...output
+              ]
+            }
+          })
+          return output;
+        })();
+
+
+
+        const mapSize = (node) => `${mapRange(node.data('centrality'), 0, 37, 10, 100)}px`;
+        var cy = cytoscape({
+          container: document.getElementById('cy'),
+          elements,
+          style: [
+              {
+                selector: "node",
+                css: {
+                  label: "data(flag)",
+                  'color': 'white',
+                  'font-size': (node) => `${mapRange(node.data('centrality'), 0, 37, 5, 85)}px`,
+                  width: mapSize,
+                  height: mapSize,
+                  'background-color': '#F6DFC7',
+                  'text-wrap': 'ellipsis',
+                  'text-halign': "center",
+                  'text-valign': "center",
+                  // 'text-max-width': '100px'
+                }
+              },
+              {
+                selector: '$node > node',
+                css: {
+                  'background-color': '#4E6886'
+                }
+              },
+              {
+                selector: "edge",
+                css: {
+                  width: '2px',
+                  'line-color': '#A87C9A',
+                  // 'line-style': 'dashed'
+                }
+              }
+            ],
+          });
+      })()
+
+    </script>
+</body>
+</html>
