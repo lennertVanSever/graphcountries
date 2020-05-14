@@ -4,6 +4,19 @@ enum AreaUnit {
   SQUARE_MILES
 }
 
+enum LanguageCode {
+  fa
+  hr
+  nl
+  pt
+  br
+  it
+  ja
+  fr
+  es
+  de
+}
+
 type Country {
   _id: String!
 
@@ -47,6 +60,15 @@ type Country {
 
   location: Point!
   name: String!
+
+  nameTranslation(languageCode: LanguageCode = nl): String
+  @cypher(
+    statement: """
+      MATCH (this)-[:hasLocale]->(translation:Translation { languageCode: languageCode })
+      RETURN translation.value
+    """
+  )
+
   nameTranslations: [Translation] @relation(name: "hasLocale", direction: "OUT")
   nativeName: String!
 
