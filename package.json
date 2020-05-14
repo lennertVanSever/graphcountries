@@ -10,7 +10,7 @@
     "deploy": "npm run build && gcloud app deploy --quiet",
     "logs": "gcloud app logs read",
     "start": "node ./build/graphql/index.js",
-    "dev": "npm run build && npm start",
+    "dev": "nodemon --exec 'npm run build && npm start'",
     "dataScraping": "babel-node -- ./src/dataScraping/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -39,7 +39,7 @@
   },
   "nodemonConfig": {
     "watch": [
-      "graphql/*"
+      "src/graphql/*"
     ],
     "ext": "js, graphql",
     "delay": 1000
