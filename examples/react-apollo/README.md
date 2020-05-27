@@ -1,4 +1,4 @@
-A simple example on how to use the GraphQL API with Create React App, the two interesting files are the index.js and app.jsx files. You can also see a [live version here](https://graphcountries-example-cra.netlify.app).
+A simple example on how to use the GraphQL API with Create React App, the two interesting files are the [index.js](src/index.js) and [app.js](src/app.js) files. You can also see a [live version here](https://graphcountries-example-cra.netlify.app).
 
 ### `yarn start`
 
