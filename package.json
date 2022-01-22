@@ -34,7 +34,7 @@
     "html2json": "^1.0.2",
     "neo4j-driver": "4.0.2",
     "neo4j-graphql-js": "^2.13.0",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^3.1.1",
     "tabletojson": "^2.0.4"
   },
   "devDependencies": {
